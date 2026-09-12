@@ -1,0 +1,50 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: rootsecret
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  php74:
+    build: ./php74
+    container_name: php74
+    volumes:
+      - D:/projects:/var/www:cached
+    depends_on:
+      - mariadb
+
+  php81:
+    build: ./php81
+    container_name: php81
+    volumes:
+      - D:/projects:/var/www:cached
+    depends_on:
+      - mariadb
+
+  php82:
+    build: ./php82
+    container_name: php82
+    volumes:
+      - D:/projects:/var/www:cached
+    depends_on:
+      - mariadb
+      
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - D:/projects:/var/www:cached
+    ports:
+      - "8000-8020:8000-8020"
+    depends_on:
+      - php74
+      - php81
+
+volumes:
+  mariadb-data:
